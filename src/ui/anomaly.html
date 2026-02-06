@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cloud-ALI AI | Anomaly Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #222;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            color: red;
+            font-weight: bold;
+        }
+
+        .ok {
+            color: green;
+            font-weight: bold;
+        }
+
+        .resource {
+            margin-left: 15px;
+            font-family: monospace;
+        }
+
+        pre {
+            background: #eee;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>⚠️ Cloud-ALI AI Anomaly Dashboard</h1>
+
+    <div class="card">
+        <h2>System Status</h2>
+        <p>Total Incidents: <span id="total"></span></p>
+        <p>Frequency Spike: <span id="freq"></span></p>
+    </div>
+
+    <div class="card">
+        <h2>Repeating Resources</h2>
+        <div id="resources"></div>
+    </div>
+
+    <div class="card">
+        <h2>🤖 Anomaly Explanation</h2>
+        <pre id="explanation">No anomalies detected.</pre>
+    </div>
+
+    <script>
+        async function loadAnomalies() {
+            const res = await fetch("/api/anomaly");
+            const data = await res.json();
+
+            // Total incidents
+            document.getElementById("total").innerText = data.total_incidents;
+
+            // Frequency spike
+            document.getElementById("freq").innerHTML =
+                data.frequency_spike
+                    ? "<span class='alert'>YES</span>"
+                    : "<span class='ok'>NO</span>";
+
+            // Repeating resources
+            const rdiv = document.getElementById("resources");
+            rdiv.innerHTML = "";
+
+            if (!data.repeating_resources || data.repeating_resources.length === 0) {
+                rdiv.innerHTML = "<span class='ok'>No repeating resources</span>";
+            } else {
+                data.repeating_resources.forEach(r => {
+                    const p = document.createElement("p");
+                    p.className = "resource";
+                    p.innerText = "🔁 " + r;
+                    rdiv.appendChild(p);
+                });
+            }
+
+            // 🤖 Anomaly explanation
+            document.getElementById("explanation").innerText =
+                data.explanation || "No anomalies detected.";
+        }
+
+        // Initial load + auto refresh
+        loadAnomalies();
+        setInterval(loadAnomalies, 15000);
+    </script>
+
+</body>
+
+</html>

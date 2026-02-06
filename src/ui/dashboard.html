@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Cloud-ALI AI | Incident Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 14px;
+            cursor: pointer;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #125aa3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #eaeef3;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        a {
+            color: #1976d2;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background: white;
+            width: 70%;
+            margin: 4% auto;
+            padding: 20px;
+            border-radius: 6px;
+            max-height: 85%;
+            overflow-y: auto;
+        }
+
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            white-space: pre-wrap;
+            border-radius: 4px;
+        }
+
+        ul {
+            margin-top: 5px;
+        }
+
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>☁️ Cloud-ALI AI – Incident Dashboard</h1>
+
+    <button onclick="runPipeline()">🔄 Refresh / Run Pipeline</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Incident ID</th>
+                <th>Resource</th>
+                <th>Severity</th>
+                <th>Confidence</th>
+                <th>Received At</th>
+            </tr>
+        </thead>
+        <tbody id="incidents"></tbody>
+    </table>
+
+    <!-- INCIDENT MODAL -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">✖</span>
+
+            <h2>📄 Incident Details</h2>
+
+            <p><b>Incident ID:</b> <span id="i_id"></span></p>
+            <p><b>Resource:</b> <span id="i_res"></span></p>
+            <p><b>Severity:</b> <span id="i_sev"></span></p>
+            <p><b>Confidence:</b> <span id="i_conf"></span></p>
+
+            <h3>🧠 RCA (Rule-Based AI)</h3>
+            <pre id="i_rca"></pre>
+
+            <h3>🤖 Groq Analysis</h3>
+
+            <b>Root Cause</b>
+            <pre id="g_rca"></pre>
+
+            <b>Why Triggered</b>
+            <pre id="g_why"></pre>
+
+            <b>Remediation</b>
+            <ul id="g_fix"></ul>
+
+            <b>Prevention</b>
+            <ul id="g_prev"></ul>
+
+            <b>Raw Groq Output (fallback)</b>
+            <pre id="g_raw"></pre>
+        </div>
+    </div>
+
+    <script>
+        async function loadIncidents() {
+            const res = await fetch("/api/incidents");
+            const data = await res.json();
+
+            const tbody = document.getElementById("incidents");
+            tbody.innerHTML = "";
+
+            data.forEach(i => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td><a onclick='showIncident(${JSON.stringify(i)})'>${i.incident_id}</a></td>
+          <td>${i.resource}</td>
+          <td>${i.severity}</td>
+          <td>${i.confidence || "low"}</td>
+          <td>${i.received_at || ""}</td>
+        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showIncident(i) {
+            document.getElementById("modal").style.display = "block";
+
+            document.getElementById("i_id").innerText = i.incident_id;
+            document.getElementById("i_res").innerText = i.resource;
+            document.getElementById("i_sev").innerText = i.severity;
+            document.getElementById("i_conf").innerText = i.confidence || "low";
+
+            // Rule-based RCA
+            document.getElementById("i_rca").innerText =
+                i.rca_rule || "No rule-based RCA available";
+
+            // Groq structured output
+            document.getElementById("g_rca").innerText =
+                i.groq_root_cause || "N/A";
+
+            document.getElementById("g_why").innerText =
+                i.groq_why_triggered || "N/A";
+
+            fillList("g_fix", i.groq_remediation);
+            fillList("g_prev", i.groq_prevention);
+
+            document.getElementById("g_raw").innerText =
+                i.groq_raw || "";
+        }
+
+        function fillList(id, items) {
+            const ul = document.getElementById(id);
+            ul.innerHTML = "";
+            (items || []).forEach(v => {
+                const li = document.createElement("li");
+                li.innerText = v;
+                ul.appendChild(li);
+            });
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        async function runPipeline() {
+            await fetch("/api/run", { method: "POST" });
+            setTimeout(loadIncidents, 3000);
+        }
+
+        loadIncidents();
+    </script>
+
+</body>
+
+</html>
