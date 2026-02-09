@@ -6,46 +6,211 @@
     <title>Cloud-ALI AI | Incident Dashboard</title>
 
     <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4f6f8;
+            --panel: #ffffff;
+            --text: #1f2933;
+            --muted: #52616b;
+            --brand: #1976d2;
+            --brand-dark: #125aa3;
+            --border: #e3e8ef;
+            --shadow: 0 10px 25px rgba(16, 24, 40, 0.08);
+            --pill: #edf2f7;
+            --critical: #d14343;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
             margin: 0;
-            padding: 20px;
+            padding: 24px;
+            color: var(--text);
         }
 
         h1 {
-            margin-bottom: 10px;
+            margin: 0 0 6px;
+            font-size: 28px;
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--panel);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .control-group label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .control-group input,
+        .control-group select {
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+            color: var(--text);
+            min-width: 140px;
         }
 
         button {
-            padding: 8px 14px;
+            padding: 9px 16px;
             cursor: pointer;
-            background: #1976d2;
+            background: var(--brand);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-weight: 600;
+            box-shadow: var(--shadow);
         }
 
         button:hover {
-            background: #125aa3;
+            background: var(--brand-dark);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-title {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 8px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stat-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--pill);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .pill-critical {
+            background: rgba(209, 67, 67, 0.12);
+            color: var(--critical);
+        }
+
+        .pill-warning {
+            background: rgba(245, 158, 11, 0.14);
+            color: var(--warning);
+        }
+
+        .pill-info {
+            background: rgba(14, 165, 233, 0.14);
+            color: var(--info);
+        }
+
+        .pill-success {
+            background: rgba(34, 197, 94, 0.14);
+            color: var(--success);
+        }
+
+        .panel {
+            background: var(--panel);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: var(--muted);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            margin-top: 15px;
         }
 
         th,
         td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
             text-align: left;
+            font-size: 14px;
         }
 
         th {
-            background: #eaeef3;
+            background: #f7f9fb;
+            color: var(--muted);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
         tr:hover {
@@ -53,9 +218,67 @@
         }
 
         a {
-            color: #1976d2;
+            color: var(--brand);
             cursor: pointer;
             text-decoration: underline;
+        }
+
+        .severity {
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .severity.critical {
+            color: var(--critical);
+        }
+
+        .severity.high {
+            color: var(--warning);
+        }
+
+        .severity.medium {
+            color: var(--info);
+        }
+
+        .severity.low {
+            color: var(--success);
+        }
+
+        .empty-state {
+            padding: 28px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state strong {
+            color: var(--text);
+        }
+
+        .confidence-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--pill);
+            color: var(--muted);
+        }
+
+        .confidence-pill.high {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+        }
+
+        .confidence-pill.medium {
+            background: rgba(14, 165, 233, 0.15);
+            color: var(--info);
+        }
+
+        .confidence-pill.low {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
         }
 
         /* Modal */
@@ -64,23 +287,25 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.4);
+            z-index: 10;
         }
 
         .modal-content {
             background: white;
-            width: 70%;
+            width: min(760px, 90%);
             margin: 4% auto;
             padding: 20px;
-            border-radius: 6px;
+            border-radius: 10px;
             max-height: 85%;
             overflow-y: auto;
+            box-shadow: var(--shadow);
         }
 
         pre {
             background: #f0f0f0;
             padding: 10px;
             white-space: pre-wrap;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
         ul {
@@ -100,23 +325,86 @@
 </head>
 
 <body>
+    <div class="page">
+        <div class="top-bar">
+            <div>
+                <h1>☁️ Cloud-ALI AI – Incident Dashboard</h1>
+                <p class="subtitle">Operational intelligence for live LogicMonitor incidents.</p>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="search">Search</label>
+                    <input id="search" type="search" placeholder="Incident ID or resource" />
+                </div>
+                <div class="control-group">
+                    <label for="severityFilter">Severity</label>
+                    <select id="severityFilter">
+                        <option value="all">All</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sortBy">Sort</label>
+                    <select id="sortBy">
+                        <option value="received_desc">Newest first</option>
+                        <option value="received_asc">Oldest first</option>
+                        <option value="severity_desc">Severity (high → low)</option>
+                        <option value="severity_asc">Severity (low → high)</option>
+                    </select>
+                </div>
+                <button onclick="runPipeline()">🔄 Refresh / Run Pipeline</button>
+            </div>
+        </div>
 
-    <h1>☁️ Cloud-ALI AI – Incident Dashboard</h1>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p class="stat-title">Total incidents</p>
+                <p class="stat-value" id="statTotal">0</p>
+                <span class="stat-pill pill-info" id="statUpdated">Updated just now</span>
+            </div>
+            <div class="stat-card">
+                <p class="stat-title">Critical + High</p>
+                <p class="stat-value" id="statCritical">0</p>
+                <span class="stat-pill pill-critical">Immediate attention</span>
+            </div>
+            <div class="stat-card">
+                <p class="stat-title">Most impacted resource</p>
+                <p class="stat-value" id="statResource">-</p>
+                <span class="stat-pill pill-warning" id="statResourceCount">0 incidents</span>
+            </div>
+            <div class="stat-card">
+                <p class="stat-title">Average confidence</p>
+                <p class="stat-value" id="statConfidence">-</p>
+                <span class="stat-pill pill-success">AI signal strength</span>
+            </div>
+        </div>
 
-    <button onclick="runPipeline()">🔄 Refresh / Run Pipeline</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Incident ID</th>
-                <th>Resource</th>
-                <th>Severity</th>
-                <th>Confidence</th>
-                <th>Received At</th>
-            </tr>
-        </thead>
-        <tbody id="incidents"></tbody>
-    </table>
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Active Incidents</h2>
+                <span class="status-text" id="statusText">Loading incidents...</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Incident ID</th>
+                        <th>Resource</th>
+                        <th>Severity</th>
+                        <th>Confidence</th>
+                        <th>Received At</th>
+                    </tr>
+                </thead>
+                <tbody id="incidents"></tbody>
+            </table>
+            <div class="empty-state" id="emptyState" hidden>
+                <strong>No incidents match these filters.</strong>
+                <p>Try adjusting the severity filter or search terms.</p>
+            </div>
+        </div>
+    </div>
 
     <!-- INCIDENT MODAL -->
     <div class="modal" id="modal">
@@ -153,24 +441,133 @@
     </div>
 
     <script>
+        let allIncidents = [];
+
         async function loadIncidents() {
             const res = await fetch("/api/incidents");
             const data = await res.json();
+            allIncidents = Array.isArray(data) ? data : [];
 
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchValue = document.getElementById("search").value.toLowerCase().trim();
+            const severityValue = document.getElementById("severityFilter").value;
+            const sortValue = document.getElementById("sortBy").value;
+            const filtered = allIncidents.filter((i) => {
+                const matchesSearch =
+                    !searchValue ||
+                    `${i.incident_id || ""}`.toLowerCase().includes(searchValue) ||
+                    `${i.resource || ""}`.toLowerCase().includes(searchValue);
+                const severity = `${i.severity || ""}`.toLowerCase();
+                const matchesSeverity =
+                    severityValue === "all" || severity === severityValue;
+                return matchesSearch && matchesSeverity;
+            });
+
+            const sorted = sortIncidents(filtered, sortValue);
+            renderIncidents(sorted);
+            updateStats(allIncidents, filtered);
+        }
+
+        function sortIncidents(items, sortValue) {
+            const severityRank = {
+                critical: 4,
+                high: 3,
+                medium: 2,
+                low: 1,
+            };
+
+            return [...items].sort((a, b) => {
+                if (sortValue.startsWith("received")) {
+                    const aDate = new Date(a.received_at || 0).getTime();
+                    const bDate = new Date(b.received_at || 0).getTime();
+                    return sortValue === "received_desc" ? bDate - aDate : aDate - bDate;
+                }
+
+                const aSeverity = severityRank[`${a.severity || ""}`.toLowerCase()] || 0;
+                const bSeverity = severityRank[`${b.severity || ""}`.toLowerCase()] || 0;
+                return sortValue === "severity_desc" ? bSeverity - aSeverity : aSeverity - bSeverity;
+            });
+        }
+
+        function renderIncidents(items) {
             const tbody = document.getElementById("incidents");
             tbody.innerHTML = "";
 
-            data.forEach(i => {
+            items.forEach(i => {
                 const tr = document.createElement("tr");
+                const severity = `${i.severity || "low"}`.toLowerCase();
+                const confidence = `${i.confidence || "low"}`.toLowerCase();
+                const confidenceLabel = confidence ? confidence : "low";
                 tr.innerHTML = `
           <td><a onclick='showIncident(${JSON.stringify(i)})'>${i.incident_id}</a></td>
           <td>${i.resource}</td>
-          <td>${i.severity}</td>
-          <td>${i.confidence || "low"}</td>
+          <td class="severity ${severity}">${i.severity || "low"}</td>
+          <td><span class="confidence-pill ${confidence}">${confidenceLabel}</span></td>
           <td>${i.received_at || ""}</td>
         `;
                 tbody.appendChild(tr);
             });
+
+            const emptyState = document.getElementById("emptyState");
+            emptyState.hidden = items.length > 0;
+        }
+
+        function updateStats(allItems, visibleItems) {
+            const statusText = document.getElementById("statusText");
+            statusText.textContent = `${visibleItems.length} of ${allItems.length} incidents`;
+
+            const totalEl = document.getElementById("statTotal");
+            totalEl.textContent = allItems.length;
+
+            const criticalHigh = allItems.filter((i) => {
+                const severity = `${i.severity || ""}`.toLowerCase();
+                return severity === "critical" || severity === "high";
+            }).length;
+            document.getElementById("statCritical").textContent = criticalHigh;
+
+            const resourceCounts = allItems.reduce((acc, item) => {
+                const key = item.resource || "Unknown";
+                acc[key] = (acc[key] || 0) + 1;
+                return acc;
+            }, {});
+
+            let topResource = "-";
+            let topCount = 0;
+            Object.entries(resourceCounts).forEach(([resource, count]) => {
+                if (count > topCount) {
+                    topResource = resource;
+                    topCount = count;
+                }
+            });
+
+            document.getElementById("statResource").textContent = topResource;
+            document.getElementById("statResourceCount").textContent = `${topCount} incident${topCount === 1 ? "" : "s"}`;
+
+            const confidenceValues = allItems
+                .map((item) => {
+                    const raw = `${item.confidence || ""}`.toLowerCase();
+                    if (!raw) return null;
+                    if (raw === "high") return 0.9;
+                    if (raw === "medium") return 0.6;
+                    if (raw === "low") return 0.3;
+                    const parsed = Number(raw);
+                    return Number.isNaN(parsed) ? null : parsed;
+                })
+                .filter((value) => value !== null);
+
+            const avgConfidence =
+                confidenceValues.length > 0
+                    ? confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length
+                    : null;
+
+            document.getElementById("statConfidence").textContent =
+                avgConfidence === null ? "-" : `${Math.round(avgConfidence * 100)}%`;
+
+            const updated = new Date();
+            document.getElementById("statUpdated").textContent = `Updated ${updated.toLocaleTimeString()}`;
         }
 
         function showIncident(i) {
@@ -217,6 +614,10 @@
             await fetch("/api/run", { method: "POST" });
             setTimeout(loadIncidents, 3000);
         }
+
+        document.getElementById("search").addEventListener("input", applyFilters);
+        document.getElementById("severityFilter").addEventListener("change", applyFilters);
+        document.getElementById("sortBy").addEventListener("change", applyFilters);
 
         loadIncidents();
     </script>
